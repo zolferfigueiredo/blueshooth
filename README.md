@@ -48,7 +48,7 @@ BlueShooth runs in your menu bar and lets you choose which paired devices should
 
 ### Option 2: Download Release
 
-Download the latest release from the [Releases](https://github.com/yourusername/blueshooth/releases) page.
+Download the latest release from the [Releases](https://github.com/zolferfigueiredo/blueshooth/releases/latest) page. Open the DMG and drag BlueShooth to Applications.
 
 ## Usage
 
@@ -122,6 +122,12 @@ xcodebuild -project BlueShooth.xcodeproj -scheme BlueShooth -configuration Relea
 # The built app will be in:
 # build/Release/BlueShooth.app
 ```
+
+### Releasing
+
+1. Raise `CFBundleShortVersionString` and `CFBundleVersion` in `BlueShooth/Info.plist` (both `X.Y.Z`).
+2. Commit and push.
+3. Run `scripts/release.sh`. It builds a universal app, signs and notarizes the DMG, and publishes `BlueShooth-X.Y.Z.dmg` and `latest.json` as GitHub release `vX.Y.Z`. It does nothing when that version is already released.
 
 ### Technologies Used
 
