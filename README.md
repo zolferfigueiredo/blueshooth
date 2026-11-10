@@ -50,6 +50,12 @@ BlueShooth runs in your menu bar and lets you choose which paired devices should
 
 Download the latest release from the [Releases](https://github.com/zolferfigueiredo/blueshooth/releases/latest) page. Open the DMG and drag BlueShooth to Applications.
 
+BlueShooth is not notarized by Apple, so macOS blocks the first launch. Open it once, then go to System Settings > Privacy & Security and click **Open Anyway**. Or run:
+
+```bash
+xattr -dr com.apple.quarantine /Applications/BlueShooth.app
+```
+
 ## Usage
 
 1. **Launch BlueShooth**: The app appears in your menu bar with a Bluetooth antenna icon
@@ -127,7 +133,7 @@ xcodebuild -project BlueShooth.xcodeproj -scheme BlueShooth -configuration Relea
 
 1. Raise `CFBundleShortVersionString` and `CFBundleVersion` in `BlueShooth/Info.plist` (both `X.Y.Z`).
 2. Commit and push.
-3. Run `scripts/release.sh`. It builds a universal app, signs and notarizes the DMG, and publishes `BlueShooth-X.Y.Z.dmg` and `latest.json` as GitHub release `vX.Y.Z`. It does nothing when that version is already released.
+3. Run `scripts/release.sh`. It builds a universal app (ad hoc signed, not notarized), makes the DMG, and publishes `BlueShooth-X.Y.Z.dmg` and `latest.json` as GitHub release `vX.Y.Z`. It does nothing when that version is already released.
 
 ### Technologies Used
 
