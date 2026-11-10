@@ -16,12 +16,16 @@ struct BluetoothDevice: Hashable {
     }
 }
 
-class BluetoothManager {
+class BluetoothManager: NSObject {
     private let userDefaultsKey = "DisabledAutoConnectDevices"
     private var disabledDevices: Set<String> = []
     private var pairedDevices: [BluetoothDevice] = []
+    private var connectNotification: IOBluetoothUserNotification?
+    // Connects the user asked for from our menu, so they aren't blocked as auto-connects.
+    private var manualConnects: Set<String> = []
 
-    init() {
+    override init() {
+        super.init()
         loadDisabledDevices()
         refreshDevices()
         setupBluetoothMonitoring()
@@ -77,13 +81,14 @@ class BluetoothManager {
             return true
         }
 
-        // Attempt to open connection
+        manualConnects.insert(device.address)
         let result = device.deviceRef.openConnection()
 
         if result == kIOReturnSuccess {
             sendNotification(title: "BlueShooth", body: "Connected to \(device.name)")
             return true
         } else {
+            manualConnects.remove(device.address)
             sendNotification(title: "BlueShooth", body: "Failed to connect to \(device.name)")
             return false
         }
@@ -132,23 +137,17 @@ class BluetoothManager {
     }
 
     private func setupBluetoothMonitoring() {
-        // Monitor Bluetooth connection attempts
-        NotificationCenter.default.addObserver(
-            forName: NSNotification.Name(rawValue: "IOBluetoothDeviceConnectedNotification"),
-            object: nil,
-            queue: .main
-        ) { [weak self] notification in
-            self?.handleDeviceConnected(notification)
-        }
+        connectNotification = IOBluetoothDevice.register(
+            forConnectNotifications: self,
+            selector: #selector(deviceConnected(_:device:))
+        )
     }
 
-    private func handleDeviceConnected(_ notification: Notification) {
-        guard let device = notification.object as? IOBluetoothDevice,
-              let address = device.addressString else {
-            return
-        }
+    @objc private func deviceConnected(_ notification: IOBluetoothUserNotification, device: IOBluetoothDevice) {
+        guard let address = device.addressString else { return }
 
-        // If this device is in our disabled list, disconnect it immediately
+        if manualConnects.remove(address) != nil { return }
+
         if disabledDevices.contains(address) {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 device.closeConnection()

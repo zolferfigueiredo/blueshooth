@@ -1,0 +1,6 @@
+#!/bin/sh
+branch=$(git symbolic-ref --short HEAD 2>/dev/null)
+if [ "$branch" = "master" ] || [ "$branch" = "main" ]; then
+  echo "Direct commits to $branch are blocked. Use a feature branch." >&2
+  exit 1
+fi
