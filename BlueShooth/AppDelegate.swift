@@ -35,14 +35,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     func setupMenu() {
         menu.removeAllItems()
 
-        // Title
-        let titleItem = NSMenuItem(title: "BlueShooth - Smart Bluetooth Manager", action: nil, keyEquivalent: "")
-        titleItem.isEnabled = false
-        menu.addItem(titleItem)
+        let settingsItem = NSMenuItem(title: "Bluetooth Settings…", action: #selector(openBluetoothSettings), keyEquivalent: "")
+        settingsItem.target = self
+        menu.addItem(settingsItem)
         menu.addItem(NSMenuItem.separator())
 
-        // Paired devices section
-        let pairedDevices = bluetoothManager.getPairedDevices()
+        let paired = bluetoothManager.getPairedDevices()
+        let pairedDevices = paired.filter(bluetoothManager.isConnected) + paired.filter { !bluetoothManager.isConnected($0) }
 
         if pairedDevices.isEmpty {
             let noDevicesItem = NSMenuItem(title: "No paired devices found", action: nil, keyEquivalent: "")
@@ -103,12 +102,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
                 // Set the submenu
                 deviceItem.submenu = deviceSubmenu
 
-                // Update main item title based on connection status
-                if isConnected {
-                    deviceItem.title = "🟢 \(device.name)"
-                } else {
-                    deviceItem.title = "⚪️ \(device.name)"
-                }
+                let icon = isConnected ? "🟢" : (autoConnectDisabled ? "⚫️" : "⚪️")
+                deviceItem.title = "\(icon) \(device.name)"
 
                 menu.addItem(deviceItem)
             }
@@ -127,6 +122,16 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         let quitItem = NSMenuItem(title: "Quit BlueShooth", action: #selector(quitApp), keyEquivalent: "q")
         quitItem.target = self
         menu.addItem(quitItem)
+
+        menu.addItem(NSMenuItem.separator())
+
+        let titleItem = NSMenuItem(title: "BlueShooth - Smart Bluetooth Manager", action: nil, keyEquivalent: "")
+        titleItem.isEnabled = false
+        menu.addItem(titleItem)
+    }
+
+    @objc func openBluetoothSettings() {
+        NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.BluetoothSettings")!)
     }
 
     @objc func connectDevice(_ sender: NSMenuItem) {
