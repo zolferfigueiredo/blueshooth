@@ -2,35 +2,38 @@ import Cocoa
 import IOBluetooth
 
 @main
-class AppDelegate: NSObject, NSApplicationDelegate {
+class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     var statusItem: NSStatusItem!
     var menu: NSMenu!
     var bluetoothManager: BluetoothManager!
 
+    // No main nib, so the default NSApplicationMain would never create this delegate.
+    static func main() {
+        let app = NSApplication.shared
+        let delegate = AppDelegate()
+        app.delegate = delegate
+        withExtendedLifetime(delegate) { app.run() }
+    }
+
     func applicationDidFinishLaunching(_ aNotification: Notification) {
-        // Create status bar item
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
+        statusItem.button?.image = NSImage(systemSymbolName: "antenna.radiowaves.left.and.right", accessibilityDescription: "BlueShooth")
 
-        if let button = statusItem.button {
-            button.image = NSImage(systemSymbolName: "antenna.radiowaves.left.and.right", accessibilityDescription: "BlueShooth")
-            button.action = #selector(statusBarButtonClicked)
-        }
-
-        // Initialize Bluetooth manager
         bluetoothManager = BluetoothManager()
 
-        // Setup menu
+        menu = NSMenu()
+        menu.delegate = self
+        statusItem.menu = menu
         setupMenu()
     }
 
-    @objc func statusBarButtonClicked() {
+    func menuNeedsUpdate(_ menu: NSMenu) {
+        bluetoothManager.refreshDevices()
         setupMenu()
-        statusItem.menu = menu
-        statusItem.button?.performClick(nil)
     }
 
     func setupMenu() {
-        menu = NSMenu()
+        menu.removeAllItems()
 
         // Title
         let titleItem = NSMenuItem(title: "BlueShooth - Smart Bluetooth Manager", action: nil, keyEquivalent: "")
@@ -114,12 +117,16 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         menu.addItem(NSMenuItem.separator())
 
         // Refresh
-        menu.addItem(NSMenuItem(title: "Refresh Devices", action: #selector(refreshDevices), keyEquivalent: "r"))
+        let refreshItem = NSMenuItem(title: "Refresh Devices", action: #selector(refreshDevices), keyEquivalent: "r")
+        refreshItem.target = self
+        menu.addItem(refreshItem)
 
         menu.addItem(NSMenuItem.separator())
 
         // Quit
-        menu.addItem(NSMenuItem(title: "Quit BlueShooth", action: #selector(quitApp), keyEquivalent: "q"))
+        let quitItem = NSMenuItem(title: "Quit BlueShooth", action: #selector(quitApp), keyEquivalent: "q")
+        quitItem.target = self
+        menu.addItem(quitItem)
     }
 
     @objc func connectDevice(_ sender: NSMenuItem) {
