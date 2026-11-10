@@ -90,7 +90,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
                 // Auto-connect toggle
                 let autoConnectDisabled = bluetoothManager.isAutoConnectDisabled(for: device)
                 let autoConnectItem = NSMenuItem(
-                    title: autoConnectDisabled ? "🚫 Auto-connect: Disabled" : "✓ Auto-connect: Enabled",
+                    title: autoConnectDisabled ? "🚫 Able to connect: Disabled" : "✓ Able to connect: Enabled",
                     action: #selector(toggleDeviceAutoConnect(_:)),
                     keyEquivalent: ""
                 )

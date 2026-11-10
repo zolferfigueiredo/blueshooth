@@ -11,7 +11,7 @@ macOS automatically connects to paired Bluetooth devices when they're in range, 
 
 ## Solution
 
-BlueShooth runs in your menu bar and lets you choose which paired devices should NOT auto-connect. Selected devices stay paired but won't connect automatically - you can still connect them manually through System Settings when you want to use them.
+BlueShooth runs in your menu bar and lets you choose which paired devices should NOT auto-connect. Selected devices stay paired but won't connect automatically - you can still connect them from the BlueShooth menu when you want to use them.
 
 ## Features
 
@@ -64,10 +64,10 @@ Download the latest release from the [Releases](https://github.com/yourusername/
    - Choose "Disconnect" to disconnect a connected device
    - No need to open System Settings!
 
-4. **Toggle Auto-Connect**:
-   - In the device submenu, click the auto-connect option
-   - ✓ Auto-connect: Enabled = Normal macOS behavior
-   - 🚫 Auto-connect: Disabled = Device will be blocked from auto-connecting
+4. **Toggle "Able to connect"**:
+   - In the device submenu, click the "Able to connect" option
+   - ✓ Able to connect: Enabled = Normal macOS behavior
+   - 🚫 Able to connect: Disabled = Device is blocked from connecting, unless you choose "Connect" in BlueShooth (its row shows ⚫️ while disconnected)
 
 5. **Refresh**: Click "Refresh Devices" to update the device list
 
